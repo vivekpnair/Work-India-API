@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: irctc_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: django_user
+      MYSQL_PASSWORD: django_password
+      MYSQL_DATABASE: irctc_clone_db
+    volumes:
+      - ./init_db.sql:/docker-entrypoint-initdb.d/init_db.sql  # Mount the init_db.sql script
+      - mysql_data:/var/lib/mysql  # Persist MySQL data
+    ports:
+      - "3306:3306"
+    networks:
+      - irctc_network
+
+  flask:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: flask_app
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: django_user
+      DB_PASSWORD: django_password
+      DB_NAME: irctc_clone_db
+    ports:
+      - "5000:5000"
+    networks:
+      - irctc_network
+
+networks:
+  irctc_network:
+    driver: bridge
+
+volumes:
+  mysql_data:  # Declare the mysql_data volume for persistence
