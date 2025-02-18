@@ -13,7 +13,7 @@ This project is built using Docker containers for easy setup and execution.
 ### Steps to Run the Project
 
 1. Copy the Project Folder :
-   - Copy the entire `IRCTC_CLONE0.1` folder to your desired location.
+   - Copy the entire folder to your desired location.
 
 2. Run the Docker Command :
    - Open a terminal in the folder location and run the following command:
