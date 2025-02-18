@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Your Reservations</h1>
+
+       <!-- Button to navigate to the reservation page -->
+       <button onclick="redirectToReserve()">Make a New Reservation</button>
+
+       <script>
+       function redirectToReserve() {
+           // Retrieve the token from localStorage
+           let token = localStorage.getItem('jwt_token');
+       
+           // Check if the token exists
+           if (token) {
+               // Redirect to /reserve with the token as a query string
+               window.location.href = '/reserve?t=' + encodeURIComponent(token);
+           } else {
+               // If no token found, you can handle this case (e.g., show an error or redirect to login)
+               alert('Token not found. Please log in.');
+           }
+       }
+       </script>       
+    {% if reservations %}
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Reservation ID</th>
+                <th>Seat No</th>
+                <th>Train Name</th>
+                <th>Journey Date</th>
+                <th>Source Station</th>
+                <th>Destination Station</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reservation in reservations %}
+            <tr>
+                <td>{{ reservation[0] }}</td>
+                <td>{{ reservation[1] }}</td>
+                <td>{{ reservation[2] }}</td>
+                <td>{{ reservation[3] }}</td>
+                <td>{{ reservation[4] }}</td>
+                <td>{{ reservation[5] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>You have no reservations.</p>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+</head>
+<body>
+    <h1>Login</h1>
+
+    <!-- Display error message if login fails -->
+    <div id="error-message" style="color: red; display: none;">
+        Invalid credentials. Please try again.
+    </div>
+
+    <!-- Login form -->
+    <form id="login-form">
+        <label for="passenger_id">Passenger ID:</label>
+        <input type="text" id="passenger_id" name="passenger_id" required><br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <button type="submit">Login</button>
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script>
+        document.getElementById("login-form").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            // Get the form data
+            const passengerId = document.getElementById('passenger_id').value;
+            const password = document.getElementById('password').value;
+
+            // Make a POST request to the backend to log in and get the token
+            axios.post('/login', {
+                passenger_id: passengerId,
+                password: password
+            })
+            .then(function (response) {
+                // Check if login was successful
+                if (response.data.message === "Login successful!") {
+                    // Store the token in localStorage
+                    const token = response.data.token;
+                    localStorage.setItem('jwt_token', token);
+
+                    window.location.href = '/home?t='+encodeURIComponent(token); 
+                }
+            })
+            .catch(function (error) {
+                // Handle error response from the backend
+                if (error.response && error.response.data.error) {
+                    // Show the error message to the user
+                    document.getElementById('error-message').style.display = 'block';
+                }
+                console.error("Error during login:", error);
+            });
+        });
+    </script>
+</body>
+</html>

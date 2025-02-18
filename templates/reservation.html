@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make a Reservation</title>
+</head>
+<body>
+    <h1>Train Reservation</h1>
+
+    <!-- Reservation form -->
+    <form id="reserveForm" method="POST" action="/reserve">
+        <label for="from_station">From Station:</label>
+        <select id="from_station" name="from_station" required>
+            {{selected_from}}
+            <!-- Dynamically populate stations here -->
+                {% for station_id, station_name in stations %}
+                    <option value="{{ station_id }}">{{ station_name }}</option>
+                {% endfor %}
+        </select><br><br>
+
+        <label for="to_station">To Station:</label>
+        <select id="to_station" name="to_station" required>
+                <!-- Dynamically populate stations here -->
+                {% for station_id, station_name in stations %}
+                    <option value="{{ station_id }}">{{ station_name }}</option>
+                {% endfor %}
+        </select><br><br>
+
+        <label for="journey_date">Journey Date:</label>
+        <input type="date" id="journey_date" name="journey_date" required><br><br>
+        <input type="hidden" id="token" name="token" required><br><br>
+        <button type="submit" onclick="addTokenToForm(event, 'reserveForm')">Find Trains</button>
+    </form>
+
+    <script>
+        function addTokenToForm(event, formId) {
+            // Prevent the form from submitting immediately
+            event.preventDefault();
+    
+            // Retrieve the token from localStorage
+            let token = localStorage.getItem('jwt_token');
+    
+            if (token) {
+                // Get the form by its ID
+                let form = document.getElementById(formId);
+                
+                // Set the value of the hidden token input field within the form
+                form.querySelector('input[name="token"]').value = token;
+                
+                // Submit the form after modifying the token input field
+                form.submit();
+            } else {
+                // If no token found, show an alert or handle as needed
+                alert('Token not found. Please log in.');
+            }
+        }
+    </script>
+
+    <h2>Available Trains between {{ selected_from }} and {{ selected_to }} on {{journey_date}}</h2>
+    <ul id="train-list">
+        {% if trains %}
+            {% for train_id, train_number, train_name, arrival_time, departure_time, cost, available_seats in trains %}
+                <li>
+                    Train No: {{ train_number }} - Name: {{ train_name }} - Arrival Time: {{ arrival_time }} - Departure Time: {{ departure_time }}
+                    <form id="bookForm-{{ train_id }}" action="/book" method="POST" style="display: inline;">
+                        <input type="hidden" name="train_id" value="{{ train_id }}">
+                        <input type="hidden" name="train_number" value="{{ train_number }}">
+                        <input type="hidden" name="train_name" value="{{ train_name }}">
+                        <input type="hidden" name="arrival_time" value="{{ arrival_time }}">
+                        <input type="hidden" name="departure_time" value="{{ departure_time }}">
+                        <input type="hidden" name="cost" value="{{ cost }}">
+                        <input type="hidden" name="available_seats" value="{{ available_seats }}">
+                        <input type="hidden" name="selected_from_id" value="{{ selected_from_id }}">
+                        <input type="hidden" name="selected_to_id" value="{{ selected_to_id }}">
+                        <input type="hidden" name="journey_date" value="{{ journey_date }}">
+                        <input type="hidden" name="token" value="">
+                        <button type="submit" onclick="addTokenToForm(event, 'bookForm-{{ train_id }}')">Book</button>
+                    </form>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>No trains available between these stations.</li>
+        {% endif %}
+    </ul>
+
+</body>
+</html>
